@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>图书馆管理系统</title>
+    <!--jquery-->
+    <script src="./Resources/jquery.min.js"></script>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="./Resources/bootstrap.min.css">
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="./Resources/bootstrap.min.js"></script>
+    <style type="text/css">
+        td {
+            vertical-align: middle !important;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nav"
+                    aria-expanded="false">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="JavaScript:void(0)">
+                    <b>图书馆管理系统</b>
+                </a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="nav">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="?p=Home&c=Index&a=index">主页</a>
+                    </li>
+                    <li>
+                        <a href="?p=Home&c=Book&a=index">图书查询</a>
+                    </li>
+                    <li class="active">
+                        <a href="?p=Home&c=User&a=index">个人中心</a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="JavaScript:void(0)" style="cursor:default">{<$smarty.session.userId>}</a>
+                    </li>
+                    <li>
+                        <a href="?p=Common&c=Login&a=logout">退出</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+    <div class="text-center container" style="width:65%;margin-top:40px;padding-top:10px;background-color: #f5f5f5;border-radius:20px;">
+        <div class="h4">
+            <b>用户信息</b>
+        </div>
+        <p>用户账号：{<$smarty.session.userId>}</p>
+        <p>用户姓名：{<$userInfo.name>}</p>
+        <p>用户班级：{<$userInfo.class>}</p>
+        <p>用户状态：{<if $userInfo.status == 1>}正常{<else>}<font color="red">挂失</font>{</if>}</p>
+        <div style="width: 200px;margin:20px auto;overflow: hidden;display: flex;justify-content: space-between">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#lost">挂失账户</a>
+                <button class="btn btn-warning" data-toggle="modal" data-target="#pwd">修改密码</a>
+        </div>
+    </div>
+    <div class="container text-center" style="width: 65%;margin-top:30px;padding:0;">
+        <div class="h4">
+            <b>我的借阅信息</b>
+        </div>
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr class="active">
+                    <th class="text-center">图书号</th>
+                    <th class="text-center">图书名称</th>
+                    <th class="text-center">借书时间</th>
+                    <th class="text-center">应还时间</th>
+                    <th class="text-center">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {<if empty($borrowInfo)>}
+                    <tr>
+                        <td colspan="5">无记录！</td>
+                    </tr>
+                {</if>}
+                {<foreach $borrowInfo as $one>}
+                    <tr {<if strtotime($one.back_date) < time()>}class="danger"{</if>}>
+                        <td>{<$one.book_id>}</td>
+                        <td>{<$one.name>}</td>
+                        <td>{<$one.borrow_date>}</td>
+                        <td>{<$one.back_date>}</td>
+                        <td>
+                            <button class="btn btn-info btn-xs {<if strtotime($one.back_date) < time()>}disabled{</if>}"
+                                    id="prolong" bookId="{<$one.book_id>}">续借
+                            </button>
+                        </td>
+                    </tr>
+                {</foreach>}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="container-fluid text-center">
+        <!-- 挂失用户模态框（Modal） -->
+        <div class="modal fade" id="lost" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="margin-top:150px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">
+                            挂失账户
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <h4>确认要挂失账号为{<$smarty.session.userId>}的账户?</h3>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="lostSubmit" class="btn btn-primary" data-dismiss="modal">确认</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal -->
+        </div>
+
+        <!-- 修改密码模态框（Modal） -->
+        <div class="modal fade" id="pwd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="margin-top:150px;">
+                <div class="modal-content">
+                    <form id="form">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="myModalLabel">
+                                修改密码
+                            </h4>
+                        </div>
+                        <div class="modal-body center-block" style="width: 45%">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon">原密码</div>
+                                    <input type="text" class="form-control" name="originPwd" placeholder="请输入原密码">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon">新密码</div>
+                                    <input type="password" class="form-control" name="newPwd" placeholder="请输入新密码">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0">
+                                <div class="input-group">
+                                    <div class="input-group-addon">确认密码</div>
+                                    <input type="password" class="form-control" name="confirmPwd" placeholder="请输入确认密码">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="pwdSubmit" class="btn btn-primary">确认</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal -->
+        </div>
+    </div>
+</body>
+
+<script>
+    
+    $(function(){
+
+        //挂失
+        $("#lostSubmit").click(function(){
+            $.post({
+                url: "?p=Home&c=User&a=lost",
+                data: {},
+                success:function(data){
+                    alert(data.message);
+                    location.reload();
+                }
+            });
+        });
+
+        //注册回车改密码事件
+        $("[name='originPwd'],[name='newPwd'],[name='confirmPwd']").keydown(function(event){
+            if(event.keyCode == 13){
+                $("#pwdSubmit").click();
+            }
+        });
+        //修改密码
+        $("#pwdSubmit").click(function(){
+            if($("[name='originPwd']").val().length == 0 || $("[name='newPwd']").val().length == 0 || $("[name='confirmPwd']").val().length == 0){
+                alert("请将信息填写完整");
+                return false;
+            }
+            if($("[name='newPwd']").val() != $("[name='confirmPwd']").val()){
+                alert("两次输入的密码不一致");
+                return false;
+            }
+            $.post({
+                url:"?p=Home&c=User&a=changePwd",
+                data:$("#form").serialize(),
+                success:function(data){
+                    alert(data.message);
+                    if(data.code == 0){
+                        location.reload();
+                    }
+                }
+            });
+        });
+
+        //续借
+        $("#prolong").click(function(){
+            $.post({
+                url:"?p=Home&c=Borrow&a=prolong",
+                data:{bookId:$(this).attr("bookId")},
+                success:function(data){
+                    alert(data.message);
+                    if(data.code == 0){
+                        location.reload();
+                    }
+                }
+            });
+        });
+    });
+    
+</script>
+
+</html>

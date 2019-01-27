@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>图书馆管理系统</title>
+    <!--jquery-->
+    <script src="./Resources/jquery.min.js"></script>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="./Resources/bootstrap.min.css">
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="./Resources/bootstrap.min.js"></script>
+    <style type="text/css">
+        td {
+            vertical-align: middle !important;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="JavaScript:void(0)">
+                    <b>图书馆管理系统</b>
+                </a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="nav">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="?p=Admin&c=Index&a=index">主页</a>
+                    </li>
+                    <li>
+                        <a href="?p=Admin&c=Book&a=index">图书管理</a>
+                    </li>
+                    <li>
+                        <a href="?p=Admin&c=User&a=index">用户管理</a>
+                    </li>
+                    <li class="active">
+                        <a href="?p=Admin&c=Borrow&a=index">借阅管理</a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="JavaScript:void(0)" style="cursor:default">{<$smarty.session.userId>}</a>
+                    </li>
+                    <li>
+                        <a href="?p=Common&c=Login&a=logout">退出</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+    <div class="h3 text-center" style="margin: 100px 0 25px;">
+        <b>借阅管理(模拟机器扫描操作)</b>
+    </div>
+    <div class="container" style="width: 350px;">
+        <form id="form">
+            <div class="form-group">
+                <div class="input-group">
+                    <div class="input-group-addon">读者ID</div>
+                    <input type="text" class="form-control" name="userId" placeholder="请输入读者ID">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    <div class="input-group-addon">图书号</div>
+                    <input type="text" class="form-control" name="bookId" placeholder="请输入图书号">
+                </div>
+            </div>
+            <div class="from-control text-center" style="margin-top: 25px;">
+                <b>操作：&nbsp;&nbsp;</b>
+                <label>
+                    <input type="radio" name="action" value="borrow" checked>
+                    <span>借&nbsp;书</span>
+                </label>
+                &nbsp;&nbsp;
+                <label>
+                    <input type="radio" name="action" value="return">
+                    <span>还&nbsp;书</span>
+                </label>
+            </div>
+            <div class="text-center" style="margin-top: 20px;">
+                <button type="button" id="submit" class="btn btn-info">确&nbsp;定</button>&nbsp;&nbsp;&nbsp;&nbsp;
+                <button type="reset" class="btn btn-danger">重&nbsp;置</button>
+            </div>
+        </form>
+    </div>
+</body>
+<script>
+    $(function(){
+
+        $("#submit").click(function(){
+            if($("[name='userId']").val().length == 0 || $("[name='bookId']").val().length == 0){
+                alert("请填写完整信息");
+                return false;
+            }
+            $.post({
+                url: "?p=Admin&c=Borrow&a=manage",
+                data: $("#form").serialize(),
+                success:function(data){
+                    alert(data.message);
+                }
+            })
+        })
+
+    })
+</script>
+</html>
