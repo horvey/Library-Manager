@@ -312,7 +312,7 @@
         //还书
         $(".return").click(function(){
             $.post({
-                url: "?p=Admin&c=Borrow&a=return",
+                url: "?p=Admin&c=Borrow&a=returnBook",
                 data:{
                     bookId : $(this).parent().attr("bookID"),
                     userId : "{<$userInfo.id>}"

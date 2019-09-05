@@ -92,7 +92,7 @@ final class Borrow extends BaseController{
     }
 
     //Json还书接口
-    public function return(){
+    public function returnBook(){
         $this->accessJson();
 
         $bookId = $_POST['bookId'];
